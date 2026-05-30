@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>{{ image.title }}</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <a href="/">← 戻る</a>
+
+        <h1>{{ image.title }}</h1>
+
+        {% if request.session.get("admin") %}
+
+<form
+    method="post"
+    action="/image/{{ image.id }}/delete"
+>
+    <button>
+        🗑 投稿削除
+    </button>
+</form>
+
+{% endif %}
+        
+        
+
+<p>{{ image.created_at }}</p>
+{% if image.pinned == 1 %}
+<p>📌 ピン留め中</p>
+{% endif %}
+<form
+    method="post"
+    action="/image/{{ image.id }}/pin"
+>
+    <button>
+        📌 ピン留め
+    </button>
+</form>
+
+<form
+    method="post"
+    action="/image/{{ image.id }}/unpin"
+>
+    <button>
+        📌 解除
+    </button>
+</form>
+<img src="/images/{{ image.filename }}">
+<p>❤ {{ image.likes }}</p>
+
+<form
+    method="post"
+    action="/image/{{ image.id }}/like"
+>
+    <button>
+        ❤ いいね
+    </button>
+</form>
+
+<hr>
+
+<h2>コメント</h2>
+
+{% for comment in comments %}
+
+<div class="comment">
+
+    <b>
+    {% if comment.pinned %}
+        📌
+    {% endif %}
+    {{ comment.username }}
+    </b>
+
+    <p>{{ comment.comment }}</p>
+
+    <small>{{ comment.created_at }}</small>
+
+    {% if request.session.get("admin") %}
+
+        {% if comment.pinned %}
+
+        <form
+            method="post"
+            action="/comment/{{ comment.id }}/unpin"
+        >
+            <button>
+                ピン解除
+            </button>
+        </form>
+
+        {% else %}
+
+        <form
+            method="post"
+            action="/comment/{{ comment.id }}/pin"
+        >
+            <button>
+                📌 ピン留め
+            </button>
+        </form>
+
+        {% endif %}
+
+        <form
+            method="post"
+            action="/comment/{{ comment.id }}/delete"
+        >
+            <button>
+                🗑 コメント削除
+            </button>
+        </form>
+
+    {% endif %}
+
+</div>
+
+<hr>
+
+{% endfor %}
+
+        </div>
+<h2>コメントを書く</h2>
+
+<form
+    action="/image/{{ image.id }}/comment"
+    method="post"
+>
+
+    <input
+        type="text"
+        name="username"
+        placeholder="名前"
+        required
+    >
+
+    <br><br>
+
+    <textarea
+        name="comment"
+        rows="5"
+        cols="50"
+        placeholder="コメント"
+        required
+    ></textarea>
+
+    <br><br>
+
+    <button type="submit">
+        投稿
+    </button>
+
+</form>
+    </div>
+
+</body>
+
+</html>

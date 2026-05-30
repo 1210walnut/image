@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>画像共有サイト</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <body>
+
+    <a href="/terms">サイト案内</a>
+    <a href="/about">管理人について</a>
+    {% if request.session.get("admin") %}
+        <a href="/admin/logout">管理者ログアウト</a>
+    {% else %}
+        <a href="/admin/login">管理者ログイン</a>
+    {% endif %}
+    <div class="container">
+
+        <h1>画像共有サイト</h1>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <div class="upload-form">
+
+            <form action="/upload" method="post" enctype="multipart/form-data">
+
+                <input
+                    type="text"
+                    name="title"
+                    placeholder="タイトル"
+                    required
+                >
+
+                <input
+                    type="file"
+                    name="file"
+                    accept=".jpg,.jpeg,.png"
+                    required
+                >
+
+                <button type="submit">
+                    投稿
+                </button>
+
+            </form>
+
+        </div>
+
+        <hr>
+
+        <div class="gallery">
+
+            {% for image in images %}
+
+            <div class="card">
+
+                <a href="/image/{{ image.id }}">
+
+                    <img
+                        src="/thumbnails/{{ image.filename }}"
+                        alt="{{ image.title }}"
+                    >
+
+                </a>
+
+                <div class="card-body">
+
+                    <h3>
+{% if image.pinned %}
+📌
+{% endif %}
+{{ image.title }}
+</h3>
+
+                    <p>{{ image.created_at }}</p>
+
+<p>
+❤ {{ image.likes }}
+</p>
+{% if request.session.get("admin") %}
+
+    {% if image.pinned %}
+
+    <form action="/image/{{ image.id }}/unpin"
+          method="post">
+
+        <button type="submit">
+            ピン解除
+        </button>
+
+    </form>
+
+    {% else %}
+
+    <form action="/image/{{ image.id }}/pin"
+          method="post">
+
+        <button type="submit">
+            ピン留め
+        </button>
+
+    </form>
+
+    {% endif %}
+
+{% endif %}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
